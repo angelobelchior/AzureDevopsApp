@@ -1,0 +1,107 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AzureDevops.Views.Pipelines.PipelinesPage"
+             xmlns:vm="clr-namespace:AzureDevops.ViewModels.Pipelines"
+             x:DataType="vm:PipelinesViewModel"
+             xmlns:converters="clr-namespace:AzureDevops.Views.Converters"
+             xmlns:models="clr-namespace:AzureDevops.Client.Models;assembly=AzureDevops.Client"
+             IconImageSource="azpipelines.png"
+             Padding="0"
+             Title="Pipelines">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:DateTimeToTextConverter x:Key="DateTimeToTextConverter" />
+            <converters:TimeSpanToTextConverter x:Key="TimeSpanToTextConverter" />
+            <converters:StatusToColorConverter x:Key="StatusToColorConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Queue"
+                     Order="Primary"
+                     Command="{Binding QueueBuildCommand}"
+                     CommandParameter="{Binding Source={x:Reference Definitions}, Path=SelectedItem}"/>
+    </ContentPage.ToolbarItems>
+
+    <Grid Padding="5,5,5,0"
+              RowDefinitions="Auto,*">
+
+        <Picker x:Name="Definitions"
+                    Grid.Row="0"
+                    HorizontalOptions="FillAndExpand"
+                    Title="Build Definitions"
+                    ItemsSource="{Binding Definitions}"
+                    ItemDisplayBinding="{Binding Name}" />
+
+        <RefreshView Grid.Row="1"
+                     IsRefreshing="{Binding RefreshBuildsCommand.IsRunning}"
+                     Command="{Binding RefreshBuildsCommand}"
+                     CommandParameter="{Binding Source={x:Reference Definitions}, Path=SelectedItem}"
+                     >
+
+            <CollectionView x:Name="Builds"
+                            ItemsSource="{Binding Builds}"
+                            ItemsLayout="VerticalList"
+                            SelectionChangedCommand="{Binding ShowBuildDetailsCommand}"
+                            SelectionChangedCommandParameter="{Binding Source={x:Reference Builds}, Path=SelectedItem}"
+                            SelectionMode="Single">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid x:DataType="models:Build"
+                              Margin="5" 
+                              RowDefinitions="20,20"
+                              ColumnDefinitions="5,*,15,65"
+                        >
+                            <BoxView Grid.Row="0"
+                                     Grid.Column="0"
+                                     Grid.RowSpan="2"
+                                     VerticalOptions="FillAndExpand"
+                                     HorizontalOptions="FillAndExpand"
+                                     BackgroundColor="{Binding Result, Converter={StaticResource StatusToColorConverter}}" />
+
+                            <Label Grid.Column="1"
+                                   Grid.Row="0"
+                                   FontAttributes="Bold"
+                                   Text="{Binding BuildNumber}" />
+                            <Label Grid.Column="1"
+                                   Grid.Row="1"
+                                   Text="{Binding BuildSourceInfo}" />
+
+                            <Label Grid.Column="2"
+                                   Grid.Row="0"
+                                   VerticalOptions="CenterAndExpand"
+                                   VerticalTextAlignment="Center"
+                                   Text="&#xf073;"
+                                   FontFamily="FASolid" />
+                            <Label Grid.Column="3"
+                                   Grid.Row="0"
+                                   FontSize="Micro"
+                                   VerticalOptions="CenterAndExpand"
+                                   VerticalTextAlignment="Center"
+                                   Text="{Binding StartTime, Converter={StaticResource DateTimeToTextConverter}}" />
+                            <Label Grid.Column="2"
+                                   Grid.Row="1"
+                                   VerticalOptions="CenterAndExpand"
+                                   VerticalTextAlignment="Center"
+                                   Text="&#xf017;"
+                                   FontFamily="FASolid" />
+                            <Label Grid.Column="3"
+                                   Grid.Row="1"
+                                   FontSize="Micro"
+                                   VerticalOptions="CenterAndExpand"
+                                   VerticalTextAlignment="Center"
+                                   Text="{Binding Duration, Converter={StaticResource TimeSpanToTextConverter}}" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </RefreshView>
+
+
+
+    </Grid>
+
+</ContentPage>

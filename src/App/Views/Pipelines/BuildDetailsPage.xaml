@@ -1,0 +1,150 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AzureDevops.Views.Pipelines.BuildDetailsPage"
+             xmlns:converters="clr-namespace:AzureDevops.Views.Converters"
+             xmlns:vm="clr-namespace:AzureDevops.ViewModels.Pipelines"
+             xmlns:models="clr-namespace:AzureDevops.Models"
+             x:DataType="vm:BuildDetailsViewModel"
+             Title="{Binding Project.Name}"
+             Padding="5">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:DateTimeToTextConverter x:Key="DateTimeToTextConverter" />
+            <converters:TimeSpanToTextConverter x:Key="TimeSpanToTextConverter" />
+            <converters:StatusToColorConverter x:Key="StatusToColorConverter" />
+            <converters:DepthToColumnDefinitionWidthConverter x:Key="DepthToColumnDefinitionWidthConverter" />
+            <converters:TextTruncateConverter x:Key="TextTruncateConverter" />
+            <Style x:Key="Text" TargetType="Label">
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="VerticalTextAlignment" Value="Center" />
+            </Style>
+            <Style x:Key="IconBrands" TargetType="Label" BasedOn="{StaticResource Text}">
+                <Setter Property="FontFamily" Value="FABrands" />
+            </Style>
+            <Style x:Key="IconSolid" TargetType="Label" BasedOn="{StaticResource Text}">
+                <Setter Property="FontFamily" Value="FASolid" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+
+    <VerticalStackLayout>
+        <Label HorizontalOptions="StartAndExpand"
+               FontAttributes="Bold"
+               FontSize="Large"
+               Text="Summary" />
+
+        <VerticalStackLayout Margin="10,10,0,0">
+            <Grid ColumnDefinitions="15,*,15,*"
+                  RowDefinitions="20,20,20,20">
+
+                <Label Grid.Row="0"
+                       Grid.Column="0"
+                       Grid.ColumnSpan="4"
+                       Style="{StaticResource Text}"
+                       Text="{Binding Build.Reason,StringFormat='Reason: {0}' }" />
+
+                <Label Grid.Row="1"
+                       Grid.Column="0"
+                       Grid.ColumnSpan="4"
+                       Style="{StaticResource Text}"
+                       Text="{Binding Build.RequestedBy.DisplayName,StringFormat='Requested By: {0}' }" />
+
+                <Label Grid.Row="2"
+                       Grid.Column="0"
+                       Style="{StaticResource IconBrands}"
+                       Text="&#xf1d3;" />
+                <Label Grid.Row="2"
+                       Grid.Column="1"
+                       Style="{StaticResource Text}"
+                       Text="{Binding Project.Name}" />
+
+                <Label Grid.Row="2"
+                       Grid.Column="2"
+                       Style="{StaticResource IconSolid}"
+                       Text="&#xf126;" />
+                <Label Grid.Row="2"
+                       Grid.Column="3"
+                       Style="{StaticResource Text}"
+                       Text="{Binding Build.BuildSourceInfo}" />
+
+                <Label Grid.Row="3"
+                       Grid.Column="0"
+                       Text="&#xf073;"
+                       Style="{StaticResource IconSolid}" />
+                <Label Grid.Row="3"
+                       Grid.Column="1"
+                       Style="{StaticResource Text}"
+                       Text="{Binding Build.StartTime}" />
+
+                <Label Grid.Row="3"
+                       Grid.Column="2"
+                       Text="&#xf017;"
+                       Style="{StaticResource IconSolid}" />
+                <Label Grid.Row="3"
+                       Grid.Column="3"
+                       Style="{StaticResource Text}"
+                       Text="{Binding Build.Duration, Converter={StaticResource TimeSpanToTextConverter}}" />
+            </Grid>
+        </VerticalStackLayout>
+        <VerticalStackLayout Margin="10,10,0,0" VerticalOptions="FillAndExpand">
+            <Label HorizontalOptions="StartAndExpand"
+                   FontAttributes="Bold"
+                   FontSize="Medium"
+                   Text="Jobs" />
+
+            <ListView x:Name="Jobs"
+                      ItemsSource="{Binding Jobs}"
+                      IsPullToRefreshEnabled="True"
+                      RefreshCommand="{Binding LoadTimelineCommand}"
+                      IsRefreshing="{Binding LoadTimelineCommand.IsRunning}"
+                      HasUnevenRows="True">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <StackLayout x:DataType="models:Job"
+                                         Margin="5"
+                                         HeightRequest="20"
+                                         VerticalOptions="Center"
+                                         Orientation="Horizontal">
+                                <Grid HorizontalOptions="FillAndExpand">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition
+                                            Width="{Binding Depth, Converter={StaticResource DepthToColumnDefinitionWidthConverter}}" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <BoxView Grid.Column="0"
+                                             VerticalOptions="FillAndExpand"
+                                             HorizontalOptions="EndAndExpand"
+                                             WidthRequest="5"
+                                             BackgroundColor="{Binding Result, Converter={StaticResource StatusToColorConverter}}" />
+
+                                    <Label Grid.Column="1"
+                                           FontAttributes="Bold"
+                                           LineBreakMode="TailTruncation"
+                                           Text="{Binding Name, Converter={StaticResource TextTruncateConverter}, ConverterParameter=35}" />
+                                </Grid>
+
+                                <StackLayout Orientation="Horizontal">
+                                    <Label WidthRequest="15"
+                                           Text="&#xf017;"
+                                           FontFamily="FASolid" />
+
+                                    <Label WidthRequest="45"
+                                           FontSize="Micro"
+                                           Text="{Binding Duration, Converter={StaticResource TimeSpanToTextConverter}}" />
+                                </StackLayout>
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </VerticalStackLayout>
+
+    </VerticalStackLayout>
+
+</ContentPage>

@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AzureDevops.Views.PersonalAccessTokenLoginPage"
+             xmlns:vm="clr-namespace:AzureDevops.ViewModels"
+             x:DataType="vm:PersonalAccessTokenLoginViewModel"
+             NavigationPage.HasNavigationBar="False"
+             Padding="20">
+
+    <Grid Padding="20" 
+          RowSpacing="20"
+          RowDefinitions="*, 80, 80, 40, 20"
+          >
+        
+        <Image Grid.Row="0"
+               Source="logo.png" />
+
+        <StackLayout Grid.Row="1">
+            <Label Text="Organization"/>
+            <Entry Text="{Binding Organization}" />
+        </StackLayout>
+
+        <StackLayout Grid.Row="2">
+            <Label Text="PAT"/>
+            <Entry IsPassword="True"
+                   Text="{Binding PersonalAccessToken}" />
+        </StackLayout>
+
+        <Button Grid.Row="3"
+                Text="Login"
+                BackgroundColor="#13589D"
+                TextColor="#FFFFFF"
+                Command="{Binding LoginCommand}" />
+
+        <Label Grid.Row="4"
+               HorizontalTextAlignment="Center"
+               TextColor="#13589D"
+               TextDecorations="Underline"
+               Text="Authenticate access with personal access tokens">
+            <Label.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding OpenUrlCommand}" />
+            </Label.GestureRecognizers>
+        </Label>
+    </Grid>
+</ContentPage>

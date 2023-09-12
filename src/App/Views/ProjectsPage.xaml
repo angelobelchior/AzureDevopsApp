@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AzureDevops.Views.ProjectsPage"
+             xmlns:vm="clr-namespace:AzureDevops.ViewModels"
+             xmlns:converters="clr-namespace:AzureDevops.Views.Converters"
+             xmlns:models="clr-namespace:AzureDevops.Client.Models;assembly=AzureDevops.Client"
+             x:DataType="vm:ProjectsPageViewModel"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             ios:Page.UseSafeArea="True"
+             IconImageSource="menu.png"
+             Title="Projects"
+             Padding="10">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:ProjectNameToAbbreviationConverter x:Key="NameToAbbreviationConverter" />
+            <converters:ProjectIdToColorConverter x:Key="ProjectIdToColorConverter" />
+            <converters:ProjectVisibilityToIconConverter x:Key="ProjectVisibilityToIconConverter" />
+
+            <Style x:Key="MiniText" TargetType="Label">
+                <Setter Property="TextColor" Value="#6E6E6E" />
+                <Setter Property="FontSize" Value="Micro" />
+                <Setter Property="VerticalTextAlignment" Value="Start" />
+                <Setter Property="LineBreakMode" Value="TailTruncation" />
+            </Style>
+
+            <Style x:Key="HeaderTitle" TargetType="Label">
+                <Setter Property="FontSize" Value="Title" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="Margin" Value="0,0,0,10" />
+            </Style>
+
+            <Style x:Key="MainTitle" TargetType="Label">
+                <Setter Property="VerticalTextAlignment" Value="Center" />
+                <Setter Property="FontSize" Value="Default" />
+                <Setter Property="FontAttributes" Value="Bold" />
+            </Style>
+
+            <Style x:Key="MainTitleIcon" TargetType="Label">
+                <Setter Property="VerticalOptions" Value="Fill" />
+                <Setter Property="VerticalTextAlignment" Value="Center" />
+                <Setter Property="FontFamily" Value="FASolid" />
+                <Setter Property="Margin" Value="2" />
+            </Style>
+
+            <Style x:Key="TextAbbreviation" TargetType="Label">
+                <Setter Property="HorizontalTextAlignment" Value="Center" />
+                <Setter Property="VerticalTextAlignment" Value="Center" />
+                <Setter Property="FontSize" Value="Body" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="#FFFFFF" />
+                <Setter Property="HeightRequest" Value="50" />
+                <Setter Property="WidthRequest" Value="50" />
+            </Style>
+
+            <Style x:Key="TextAbbreviationBox" TargetType="Frame">
+                <Setter Property="CornerRadius" Value="30" />
+                <Setter Property="BorderColor" Value="Transparent" />
+                <Setter Property="HeightRequest" Value="60" />
+                <Setter Property="WidthRequest" Value="60" />
+                <Setter Property="VerticalOptions" Value="Fill" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <VerticalStackLayout VerticalOptions="FillAndExpand">
+        <CollectionView x:Name="Projects"
+                    ItemsSource="{Binding Projects}"
+                    SelectionChangedCommand="{Binding LoadProjectFeaturesCommand}"
+                    SelectionChangedCommandParameter="{Binding Source={x:Reference Projects}, Path=SelectedItem}"
+                    SelectionMode="Single">
+
+            <CollectionView.Header>
+                <Label Style="{StaticResource HeaderTitle}"
+                   Text="Projects" />
+            </CollectionView.Header>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid x:DataType="models:Project" 
+                      HorizontalOptions="FillAndExpand"
+                      VerticalOptions="FillAndExpand"
+                      RowDefinitions="35, 30"
+                      ColumnDefinitions="70,*"
+                      Padding="5,0,0,5">
+
+                        <Frame Grid.RowSpan="2"
+                           Style="{StaticResource TextAbbreviationBox}"
+                           BackgroundColor="{Binding Id, Converter={StaticResource ProjectIdToColorConverter}}">
+                            <Label Style="{StaticResource TextAbbreviation}"
+                               Text="{Binding Name,Converter={StaticResource NameToAbbreviationConverter}}"
+                                />
+                        </Frame>
+
+                        <Grid Grid.Row="0"
+                          Grid.Column="1"
+                          ColumnDefinitions="Auto,*"
+                          VerticalOptions="Center"
+                          Margin="0,5,0,0">
+
+                            <Label Grid.Column="0"
+                               Style="{StaticResource MainTitle}"
+                               Text="{Binding Name}" />
+
+                            <Label Grid.Column="1"
+                               Style="{StaticResource MainTitleIcon}"
+                               Text="{Binding Visibility, Converter={StaticResource ProjectVisibilityToIconConverter}}" />
+                        </Grid>
+
+                        <Label Grid.Column="1" Grid.Row="1"
+                           Style="{StaticResource MiniText}"
+                           Text="{Binding Description}" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </VerticalStackLayout>
+
+</ContentPage>
